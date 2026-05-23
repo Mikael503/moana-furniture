@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/bohmi/Downloads/site_fixed_100/site_fixed/src/instrumentation.ts"],"sourcesContent":["export async function register() {\n  if (process.env.NEXT_RUNTIME === \"nodejs\") {\n    await import(\"./instrumentation-node\");\n  }\n}\n"],"names":[],"mappings":";;;;AAAO,eAAe;IACpB,wCAA2C;QACzC;IACF;AACF","debugId":null}}]
+}
