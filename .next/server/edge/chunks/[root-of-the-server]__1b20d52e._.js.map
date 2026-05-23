@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 16, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/site_fixed/src/middleware.ts"],"sourcesContent":["import { NextResponse } from 'next/server'\nimport type { NextRequest } from 'next/server'\n\nexport async function middleware(request: NextRequest) {\n  const response = NextResponse.next()\n\n  response.headers.set('X-Frame-Options', 'SAMEORIGIN')\n  response.headers.set('X-Content-Type-Options', 'nosniff')\n\n  return response\n}\n\nexport const config = {\n  matcher: '/((?!api/webhooks|_next/static|_next/image|favicon.ico).*)',\n}s"],"names":[],"mappings":";;;;;;AAAA;AAAA;;AAGO,eAAe,WAAW,OAAoB;IACnD,MAAM,WAAW,8MAAY,CAAC,IAAI;IAElC,SAAS,OAAO,CAAC,GAAG,CAAC,mBAAmB;IACxC,SAAS,OAAO,CAAC,GAAG,CAAC,0BAA0B;IAE/C,OAAO;AACT;AAEO,MAAM,SAAS;IACpB,SAAS;AACX"}}]
-}
