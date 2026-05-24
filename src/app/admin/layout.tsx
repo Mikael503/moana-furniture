@@ -1,17 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { LayoutDashboard, Package, ShoppingCart, Users, Tag, ChevronLeft } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Tag, ChevronLeft, Menu, X } from 'lucide-react';
 
-// NOTE : La vérification principale est faite côté serveur dans middleware.ts.
-// Ce layout ne fait qu'un rendu conditionnel de fallback (si le hook côté client
-// détecte l'absence de droits avant que la session soit chargée).
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, isAdmin, isLoading } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -24,12 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // Fallback — le middleware a déjà bloqué les non-admins
-  if (!user || !isAdmin) return (
-  <div className="min-h-screen flex items-center justify-center">
-    <p className="text-muted-foreground">Accès refusé.</p>
-  </div>
-);
+  if (!user || !isAdmin) return null;
 
   const navItems = [
     { href: '/admin', label: 'Tableau de bord', icon: LayoutDashboard },
@@ -41,24 +34,46 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-primary text-primary-foreground border-b">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      {/* Header mobile + desktop */}
+      <header className="bg-primary text-primary-foreground border-b sticky top-0 z-50">
+        <div className="px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* Burger mobile */}
+            <button
+              className="md:hidden p-1"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
             <Link href="/" className="flex items-center gap-2 text-sm hover:opacity-80">
               <ChevronLeft className="h-4 w-4" />
-              Retour au site
+              <span className="hidden sm:inline">Retour au site</span>
             </Link>
-            <span className="text-primary-foreground/40">|</span>
+            <span className="text-primary-foreground/40 hidden sm:inline">|</span>
             <span className="font-semibold">Administration</span>
           </div>
-          <div className="text-sm">
-            Connecté en tant que <span className="font-medium">{user.email}</span>
+          <div className="text-xs text-primary-foreground/80 hidden sm:block truncate max-w-48">
+            {user.email}
           </div>
         </div>
       </header>
 
-      <div className="flex">
-        <aside className="w-64 bg-card border-r min-h-[calc(100vh-56px)] p-4">
+      <div className="flex relative">
+        {/* Overlay mobile */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-30 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar */}
+        <aside className={`
+          fixed md:sticky top-14 z-40 md:z-auto
+          h-[calc(100vh-56px)] w-64 bg-card border-r p-4
+          transition-transform duration-300
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        `}>
           <nav className="space-y-1">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -66,18 +81,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                     isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                   }`}
                 >
-                  <item.icon className="h-5 w-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  <span className="font-medium text-sm">{item.label}</span>
                 </Link>
               );
             })}
           </nav>
         </aside>
-        <main className="flex-1 p-6">{children}</main>
+
+        {/* Main content */}
+        <main className="flex-1 p-4 md:p-6 min-w-0 overflow-x-hidden">
+          {children}
+        </main>
       </div>
     </div>
   );
