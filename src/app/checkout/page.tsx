@@ -188,7 +188,7 @@ export default function CheckoutPage() {
       const stripe = await stripePromise;
       if (!stripe) throw new Error('Stripe non disponible');
 
-      const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+      const { error: stripeError } = await (stripe as any).redirectToCheckout({ sessionId: data.sessionId });
       if (stripeError) throw stripeError;
 
       clearCart();
